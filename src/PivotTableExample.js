@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
 import 'react-pivottable/pivottable.css';
-import './PivotTableExample.css'; // Import CSS file for styling
+import './PivotTableExample.css'; 
 
 class PivotTableExample extends Component {
   constructor(props) {
@@ -37,25 +37,25 @@ class PivotTableExample extends Component {
       .then((response) => response.json())
       .then((data) => {
         if (data.length === 0) {
-          return; // Handle empty data scenario
+          return; 
         }
 
-        // Extract fields dynamically from the first item in data
+        
         const fields = Object.keys(data[0]);
 
-        // Transform data for PivotTable
+      
         const transformedData = data.map((item) => fields.map((field) => item[field]));
 
-        transformedData.unshift(fields); // Add fields as the first row
+        transformedData.unshift(fields); 
 
-        // Update state with dynamic fields and data
+        
         this.setState({
           pivotState: {
             ...this.state.pivotState,
             data: transformedData,
-            vals: fields.slice(2), // Assuming first two fields are identifiers (e.g., id, student_name)
-            rows: [fields[0]], // Default to the first field as rows
-            cols: [], // Initialize columns as empty
+            vals: fields.slice(2),
+            rows: [fields[0]], 
+            cols: [], 
           },
           availableFields: fields,
         });
@@ -92,12 +92,29 @@ class PivotTableExample extends Component {
   };
 
   handleRefreshButtonClick = () => {
-    // Reload the page
+    
     window.location.reload();
+  };
+
+  handleAggregatorChange = (event) => {
+    const { value } = event.target;
+    this.setState({
+      pivotState: {
+        ...this.state.pivotState,
+        aggregatorName: value,
+      },
+    });
   };
 
   render() {
     const { pivotState, availableFields, selectedUseCase } = this.state;
+    const aggregators = [
+      'Count', 'Count Unique Values', 'List Unique Values', 'Sum', 'Integer Sum',
+      'Average', 'Median', 'Sample Variance', 'Sample Standard Deviation', 'Minimum',
+      'Maximum', 'First', 'Last', 'Sum over Sum', 'Sum as Fraction of Total',
+      'Sum as Fraction of Rows', 'Sum as Fraction of Columns', 'Count as Fraction of Total',
+      'Count as Fraction of Rows', 'Count as Fraction of Columns'
+    ];
 
     return (
       <div className="pivot-table-container">
@@ -117,6 +134,14 @@ class PivotTableExample extends Component {
                 </li>
               ))}
             </ul>
+          </div>
+          <div>
+            <h3>Select Aggregator</h3>
+            <select value={pivotState.aggregatorName} onChange={this.handleAggregatorChange}>
+              {aggregators.map((aggregator, index) => (
+                <option key={index} value={aggregator}>{aggregator}</option>
+              ))}
+            </select>
           </div>
           <div>
             <h3>Select Use Case</h3>
